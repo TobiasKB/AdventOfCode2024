@@ -25,76 +25,31 @@ with open(input_file, "r") as file:
 safeCount = 0
 df = pd.DataFrame(data)
 
-print(df.shape)
-# for index, row in df.iterrows():
-#     for col in range(len(row) - 1):  # Iterate through columns, avoiding index out of range
-#         if row[col] != row[col + 1]:  # Combine conditions with !=
-#             if abs(row[col] - row[col + 1]) > 2:
-#                 print("Unsafe")
-#             else:
-#                 print("Safe")
-#                 safeCount += 1
-#         else:
-#            print("Unsafe")
-
-# for index, row in df.iterrows():
-#     for col in range(len(row) - 1):
-#         # Skip if either value is NaN
-#         if pd.notna(row[col]) and pd.notna(row[col + 1]):
-#             if row[col] != row[col + 1] and abs(row[col] - row[col + 1]) <= 2:
-#                 safeCount += 1
-import pandas as pd
-
 flag_increase = False
 flag_decrease = False
 
 for index, row in df.iterrows():
     # Drop NaN values and convert to a list for valid comparisons
     valid_row = row.dropna().tolist()
-    print(valid_row)
     # Only proceed if the row has at least two numbers
     if len(valid_row) > 1:
         flag_increase = False
         flag_decrease = False
         for col in range(len(valid_row) - 1):
 
-            if flag_increase == True and  flag_decrease == True:
-                print("unsafe")
-                continue
-            if  abs(valid_row[col] - valid_row[col + 1]) > 2:
-                print("unsafe")
-                continue
+            diff = valid_row[col + 1] - valid_row[col]
+
+            if (flag_increase and  flag_decrease ) or abs(diff)>2:
+                #print("unsafe")
+                break
+
             if valid_row[col] < valid_row[col + 1] :
                 flag_decrease = True
             elif valid_row[col] > valid_row[col + 1] :
                 flag_increase = True
-            else:
-                safeCount += 1
+        else:#this else block triggers when the for loop is run without any break points.
+            safeCount += 1
 
 print(f"Safe count: {safeCount}")
 
-
-#ChatGPT Version
-safeCount = 0
-
-for _, row in df.iterrows():
-    valid_row = row.dropna().tolist()
-    if len(valid_row) > 1:
-        flag_increase, flag_decrease = False, False
-
-        for col in range(len(valid_row) - 1):
-            diff = valid_row[col + 1] - valid_row[col]
-
-            if abs(diff) > 2 or (flag_increase and flag_decrease):
-                print("unsafe")
-                break
-
-            if diff > 0:
-                flag_increase = True
-            elif diff < 0:
-                flag_decrease = True
-        else:
-            safeCount += 1  # Only increment if the loop completes without break
-
-print(f"Safe count: {safeCount}")
 
